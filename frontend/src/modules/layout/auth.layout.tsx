@@ -24,6 +24,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuth } from '../auth/providers/auth.provider.tsx';
 import { UsersCount } from '../tokens-manage/UsersCount/UsersCount.tsx';
+import { TransferRequests } from '../tokens-manage/TransferRequests/TransferRequests.tsx';
 
 
 function Copyright(props: any) {
@@ -95,7 +96,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const defaultTheme = createTheme();
 
 const AuthLayout = ({ children }: React.PropsWithChildren) => {
-  const [ open, setOpen ] = React.useState(true);
+  const [ open, setOpen ] = React.useState(false);
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -190,7 +191,6 @@ const AuthLayout = ({ children }: React.PropsWithChildren) => {
         >
           <Toolbar/>
 
-
           <Container maxWidth="lg" sx={ { mt: 4, mb: 4 } }>
             <Grid container spacing={ 3 }>
               <Grid item xs={ 12 } md={ 7 } lg={ 8 }>
@@ -200,10 +200,10 @@ const AuthLayout = ({ children }: React.PropsWithChildren) => {
                     display: 'flex',
                     flexDirection: 'column',
                     height: 'auto',
-                    minHeight: '70vh',
+                    minHeight: '70vh'
                   } }
                 >
-                  Form
+                  <TransferRequests/>
                 </Paper>
               </Grid>
               <Grid item xs={ 12 } md={ 5 } lg={ 4 }>
@@ -213,10 +213,10 @@ const AuthLayout = ({ children }: React.PropsWithChildren) => {
                     display: 'flex',
                     flexDirection: 'column',
                     height: 'auto',
-                    minHeight: '70vh',
+                    minHeight: '70vh'
                   } }
                 >
-                  <UsersCount />
+                  <UsersCount/>
                 </Paper>
               </Grid>
             </Grid>
