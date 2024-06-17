@@ -44,11 +44,11 @@ function App() {
 
   return (
     <>
-      <div className="App">
-        <ConnectionState isConnected={ isConnected }/>
-        <Events events={ fooEvents }/>
-        <ConnectionManager/>
-      </div>
+      {/*<div className="App">*/}
+      {/*  <ConnectionState isConnected={ isConnected }/>*/}
+      {/*  <Events events={ fooEvents }/>*/}
+      {/*  <ConnectionManager/>*/}
+      {/*</div>*/}
 
       <BrowserRouter>
         <UNotificationsProvider>
