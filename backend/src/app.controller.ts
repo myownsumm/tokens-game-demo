@@ -87,8 +87,8 @@ export class AppController {
       throw new BadRequestException(`User has only ${ senderTokensAvailable.tokens } tokens available. Operation is not allowed`);
     }
 
-    senderTokensAvailable.tokens -= transfer.amount;
-    recipientTokensAvailable.tokens += transfer.amount;
+    senderTokensAvailable.tokens -= Number(transfer.amount);
+    recipientTokensAvailable.tokens += Number(transfer.amount);
     transfer.status = 'approved';
   }
 
