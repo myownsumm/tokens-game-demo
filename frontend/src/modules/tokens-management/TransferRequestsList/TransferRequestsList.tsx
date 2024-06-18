@@ -13,10 +13,12 @@ import { useNotifications } from '@u-cat/u-notifications';
 import { TokenTransfer, TRANSFER_REQUEST_STATUS_TO_COLOR } from '../tokens.typings.ts';
 import { getUserById } from '../../auth/auth.mock.ts';
 import Button from '@mui/material/Button';
-import { CanDoOperations } from '../../permissions-control/components/CanDo.tsx';
+import { CanDo, CanDoOperations } from '../../permissions-control/components/CanDo.tsx';
+import { useAuth } from '../../auth/providers/auth.provider.tsx';
 
 
 export function TransferRequestsList() {
+  const { authUser } = useAuth();
   const [ tokenTransfers, setTokenTransfers ] = useState<TokenTransfer[]>([]);
   const { danger } = useNotifications();
 
@@ -84,14 +86,24 @@ export function TransferRequestsList() {
               </TableCell>
               <TableCell>
                 <Stack direction="row" spacing={ 0 }>
-                  <IconButton size="small" aria-label="reject"
-                              onClick={ () => handleClickOpen(CanDoOperations.reject, row.id) }>
-                    <CloseButton fontSize="inherit" color="error"/>
-                  </IconButton>
-                  <IconButton size="small" aria-label="approve"
-                              onClick={ () => handleClickOpen(CanDoOperations.approve, row.id) }>
-                    <CheckButton fontSize="inherit" color="success"/>
-                  </IconButton>
+
+                  <CanDo operation={ CanDoOperations.reject }
+                         user={ authUser! }
+                         entity={ row }>
+                    <IconButton size="small" aria-label="reject"
+                                onClick={ () => handleClickOpen(CanDoOperations.reject, row.id) }>
+                      <CloseButton fontSize="inherit" color="error"/>
+                    </IconButton>
+                  </CanDo>
+
+                  <CanDo operation={ CanDoOperations.approve }
+                         user={ authUser! }
+                         entity={ row }>
+                    <IconButton size="small" aria-label="approve"
+                                onClick={ () => handleClickOpen(CanDoOperations.approve, row.id) }>
+                      <CheckButton fontSize="inherit" color="success"/>
+                    </IconButton>
+                  </CanDo>
                 </Stack>
               </TableCell>
             </TableRow>

@@ -6,11 +6,11 @@ import { EventsGateway } from './events.gateway';
 import { v4 as uuidv4 } from 'uuid';
 
 
-const TOKENS_AVAILABLE_MAP = new Map();
-TOKENS_AVAILABLE_MAP.set('111', { tokens: 10 });
-TOKENS_AVAILABLE_MAP.set('222', { tokens: 10 });
-TOKENS_AVAILABLE_MAP.set('333', { tokens: 10 });
-TOKENS_AVAILABLE_MAP.set('444', { tokens: 10 });
+const USERS_TOKENS_MAP = new Map();
+USERS_TOKENS_MAP.set('111', { tokens: 10 });
+USERS_TOKENS_MAP.set('222', { tokens: 10 });
+USERS_TOKENS_MAP.set('333', { tokens: 10 });
+USERS_TOKENS_MAP.set('444', { tokens: 10 });
 
 
 const TOKENS_TRANSFERS_MAP = new Map();
@@ -41,7 +41,7 @@ export class AppController {
   getUsersTokens() {
     const list = [];
 
-    for (let [ id, value ] of TOKENS_AVAILABLE_MAP) {
+    for (let [ id, value ] of USERS_TOKENS_MAP) {
       list.push({ id, ...value });
     }
 
@@ -61,6 +61,12 @@ export class AppController {
 
   @Post('/tokens-transfers')
   createTokenTransfer(@Body() tokenTransfer: any) {
+    const userAvailableTokens = USERS_TOKENS_MAP.get(tokenTransfer.senderId)?.tokens;
+
+    if (!userAvailableTokens || userAvailableTokens < tokenTransfer.amount) {
+      throw new BadRequestException(`Token transfer could not be created: Recipient has no such amount of tokens.`);
+    }
+
     tokenTransfer.status = 'pending';
 
     TOKENS_TRANSFERS_MAP.set(uuidv4(), tokenTransfer);
@@ -74,8 +80,8 @@ export class AppController {
       throw new BadRequestException(`Token transfer not found: ${ id }`);
     }
 
-    const senderTokensAvailable = TOKENS_AVAILABLE_MAP.get(transfer.senderId);
-    const recipientTokensAvailable = TOKENS_AVAILABLE_MAP.get(transfer.recipientId);
+    const senderTokensAvailable = USERS_TOKENS_MAP.get(transfer.senderId);
+    const recipientTokensAvailable = USERS_TOKENS_MAP.get(transfer.recipientId);
 
     if (!senderTokensAvailable) {
       throw new BadRequestException(`User tokens available not found: ${ id }`);

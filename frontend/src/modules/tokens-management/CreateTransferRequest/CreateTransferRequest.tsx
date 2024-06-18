@@ -38,8 +38,8 @@ export function CreateTransferRequest({ senderId, handleClose }: RequestTransfer
               handleClose();
             }
           )
-          .catch(() => {
-            danger('Problem occurred while trying to create new Transfer Request.');
+          .catch((err) => {
+            danger(`Error: ${ err.response?.data?.message }`);
           })
       } }
     >

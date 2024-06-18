@@ -119,7 +119,8 @@ const AuthLayout = ({ children }: React.PropsWithChildren) => {
               Dapp - Penalty
             </Typography>
             <SocketsConnector/>
-            <Avatar alt={authUser?.email} src={ authUser?.avatar } />
+
+            <Avatar sx={ { m: 2, bgcolor: 'secondary.main' } } alt={authUser?.email} src={ authUser?.avatar } />
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={ open }>
