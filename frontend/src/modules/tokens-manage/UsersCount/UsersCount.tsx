@@ -11,14 +11,34 @@ import { useAuth } from '../../auth/providers/auth.provider.tsx';
 import Box from '@mui/material/Box';
 import { CanDo, CanDoOperations } from '../../permissions-control/components/CanDo.tsx';
 import { AUTH_USERS } from '../../auth/auth.mock.ts';
+import { useCallback, useEffect, useState } from 'react';
+import axios from 'axios';
+import { useNotifications } from '@u-cat/u-notifications/dist/providers/u-notifications.provider';
+import { UserTokensAvailable } from '../tokens.typings.ts';
 
 
 export function UsersCount() {
   const { authUser } = useAuth();
+  const { danger } = useNotifications();
 
   const [ open, setOpen ] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const [ tokensAvailable, setTokensAvailable ] = useState<UserTokensAvailable[]>([]);
+
+  useEffect(() => {
+    axios.request({ method: 'GET', url: 'http://localhost:3000/users-tokens' })
+      .then(
+        response => {
+          setTokensAvailable(response.data);
+        }
+      )
+      .catch(() => {
+        danger('Problem occurred while trying to fetch Tokens available list.');
+      })
+  }, [authUser]);
+
 
   const style = {
     position: 'absolute' as 'absolute',
@@ -32,11 +52,15 @@ export function UsersCount() {
     p: 4
   };
 
+  const getTokensAvailable = useCallback((userId: string) => {
+    return tokensAvailable.find(i => i.userId === userId)?.tokens;
+  }, [ tokensAvailable ]);
+
   return (
     <>
       <List sx={ { width: '100%', maxWidth: 360, bgcolor: 'background.paper' } }>
         { AUTH_USERS.map((user) => (
-          <div key={user.id}>
+          <div key={ user.id }>
             <ListItem alignItems="flex-start">
               <ListItemAvatar>
                 <Avatar alt={ user.email } src={ user.avatar }/>
@@ -51,7 +75,7 @@ export function UsersCount() {
                       variant="body2"
                       color="text.primary"
                     >
-                      10 tokens
+                      { `${ getTokensAvailable(user.id) } tokens` }
                     </Typography>
                     <CanDo operation={ CanDoOperations.transfer }
                            user={ authUser! }
