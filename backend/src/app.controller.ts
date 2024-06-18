@@ -1,24 +1,23 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
 import { EventsGateway } from './events.gateway';
+import { v4 as uuidv4 } from 'uuid';
 
 
-const TOKENS_AVAILABLE = [
-  { userId: '111', tokens: 10 },
-  { userId: '222', tokens: 10 },
-  { userId: '333', tokens: 10 },
-  { userId: '444', tokens: 10 }
-];
+const TOKENS_AVAILABLE_MAP = new Map();
+TOKENS_AVAILABLE_MAP.set('111', { tokens: 10 });
+TOKENS_AVAILABLE_MAP.set('222', { tokens: 10 });
+TOKENS_AVAILABLE_MAP.set('333', { tokens: 10 });
+TOKENS_AVAILABLE_MAP.set('444', { tokens: 10 });
 
-const TOKENS_TRANSFERS = [
-  { senderId: '111', recipientId: '222', amount: 5, status: 'pending' },
-  { senderId: '222', recipientId: '333', amount: 4, status: 'pending' },
-  { senderId: '444', recipientId: '333', amount: 5, status: 'pending' },
-  { senderId: '222', recipientId: '111', amount: 1, status: 'pending' },
-  { senderId: '333', recipientId: '111', amount: 9, status: 'pending' }
-]
+
+const TOKENS_TRANSFERS_MAP = new Map();
+TOKENS_TRANSFERS_MAP.set(uuidv4(), { senderId: '111', recipientId: '222', amount: 5, status: 'pending' });
+TOKENS_TRANSFERS_MAP.set(uuidv4(), { senderId: '222', recipientId: '333', amount: 5, status: 'pending' });
+TOKENS_TRANSFERS_MAP.set(uuidv4(), { senderId: '444', recipientId: '111', amount: 5, status: 'pending' });
+TOKENS_TRANSFERS_MAP.set(uuidv4(), { senderId: '444', recipientId: '111', amount: 5, status: 'pending' });
 
 
 @Controller()
@@ -42,17 +41,59 @@ export class AppController {
 
   @Get('/users-tokens')
   getUsersTokens() {
-    return TOKENS_AVAILABLE;
+    const list = [];
+
+    for (let [ id, value ] of TOKENS_AVAILABLE_MAP) {
+      list.push({ id, ...value });
+    }
+
+    return list;
   }
 
   @Get('/tokens-transfers')
   getTokenTransfers() {
-    return TOKENS_TRANSFERS;
+    const list = [];
+
+    for (let [ id, value ] of TOKENS_TRANSFERS_MAP) {
+      list.push({ id, ...value });
+    }
+
+    return list;
   }
 
   @Post('/tokens-transfers')
   createTokenTransfer(@Body() tokenTransfer: any) {
     tokenTransfer.status = 'pending';
-    TOKENS_TRANSFERS.push(tokenTransfer);
+
+    TOKENS_TRANSFERS_MAP.set(uuidv4(), tokenTransfer);
+  }
+
+  @Put('/tokens-transfers/:id/approve')
+  approveTokenTransfer(@Param('id') id: string) {
+    const transfer = TOKENS_TRANSFERS_MAP.get(id);
+
+    if (!transfer) {
+      throw new BadRequestException(`Token transfer not found: ${ id }`);
+    }
+
+    const senderTokensAvailable = TOKENS_AVAILABLE_MAP.get(transfer.senderId);
+    const recipientTokensAvailable = TOKENS_AVAILABLE_MAP.get(transfer.recipientId);
+
+    if (!senderTokensAvailable) {
+      throw new BadRequestException(`User tokens available not found: ${ id }`);
+    }
+
+    if (senderTokensAvailable.tokens < transfer.amount) {
+      throw new BadRequestException(`User has only ${ senderTokensAvailable.tokens } tokens available. Operation is not allowed`);
+    }
+
+    senderTokensAvailable.tokens -= Number(transfer.amount);
+    recipientTokensAvailable.tokens += Number(transfer.amount);
+    transfer.status = 'approved';
+  }
+
+  @Put('/tokens-transfers/:id/reject')
+  rejectTokenTransfer(@Param('id') id: string) {
+    TOKENS_TRANSFERS_MAP.get(id).status = 'rejected';
   }
 }

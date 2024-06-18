@@ -14,7 +14,7 @@ export interface RequestTransferProps {
 }
 
 
-export function RequestTransfer({ senderId, handleClose }: RequestTransferProps) {
+export function CreateTransferRequest({ senderId, handleClose }: RequestTransferProps) {
   const { danger, info } = useNotifications();
   const validationSchema = Yup.object().shape({
     senderId: Yup.string().required('Sender is required'),

@@ -1,11 +1,24 @@
 export enum TokenTransferStatus {
   pending = 'pending',
   approved = 'approved',
-  completed = 'completed',
+  rejected = 'completed',
 }
 
 
-export type UserTokensAvailable = { userId: string, tokens: number };
-export type TokenTransfer = { senderId: string, recipientId: string, status: TokenTransferStatus, amount: number };
+export const TRANSFER_REQUEST_STATUS_TO_COLOR = {
+  [TokenTransferStatus.pending]: 'warning',
+  [TokenTransferStatus.approved]: 'success',
+  [TokenTransferStatus.rejected]: 'error'
+}
+
+
+export type UserTokensAvailable = { id: string, tokens: number };
+export type TokenTransfer = {
+  id: string;
+  senderId: string,
+  recipientId: string,
+  status: TokenTransferStatus,
+  amount: number
+};
 
 
