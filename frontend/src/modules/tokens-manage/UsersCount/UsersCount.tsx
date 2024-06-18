@@ -15,14 +15,20 @@ import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNotifications } from '@u-cat/u-notifications/dist/providers/u-notifications.provider';
 import { UserTokensAvailable } from '../tokens.typings.ts';
+import { RequestTransfer } from '../RequestTransfer/RequestTransfer.tsx';
 
 
 export function UsersCount() {
   const { authUser } = useAuth();
   const { danger } = useNotifications();
 
-  const [ open, setOpen ] = React.useState(false);
-  const handleOpen = () => setOpen(true);
+  const [ open, setOpen ] = useState(false);
+  const [ senderId, setSenderId ] = useState('');
+
+  const handleOpen = (senderId: string) => {
+    setSenderId(senderId);
+    setOpen(true);
+  }
   const handleClose = () => setOpen(false);
 
   const [ tokensAvailable, setTokensAvailable ] = useState<UserTokensAvailable[]>([]);
@@ -37,7 +43,7 @@ export function UsersCount() {
       .catch(() => {
         danger('Problem occurred while trying to fetch Tokens available list.');
       })
-  }, [authUser]);
+  }, [ authUser ]);
 
 
   const style = {
@@ -80,7 +86,7 @@ export function UsersCount() {
                     <CanDo operation={ CanDoOperations.transfer }
                            user={ authUser! }
                            entity={ user }>
-                      <Button onClick={ handleOpen }>Transfer</Button>
+                      <Button onClick={ () => handleOpen(user.id) }>Transfer</Button>
                     </CanDo>
                   </React.Fragment>
                 }
@@ -99,11 +105,9 @@ export function UsersCount() {
       >
         <Box sx={ style }>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Text in a modal
+            Request a transfer
           </Typography>
-          <Typography id="modal-modal-description" sx={ { mt: 2 } }>
-            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-          </Typography>
+          <RequestTransfer senderId={senderId} handleClose={handleClose}/>
         </Box>
       </Modal>
     </>

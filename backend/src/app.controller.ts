@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
@@ -48,5 +48,11 @@ export class AppController {
   @Get('/tokens-transfers')
   getTokenTransfers() {
     return TOKENS_TRANSFERS;
+  }
+
+  @Post('/tokens-transfers')
+  createTokenTransfer(@Body() tokenTransfer: any) {
+    tokenTransfer.status = 'pending';
+    TOKENS_TRANSFERS.push(tokenTransfer);
   }
 }
