@@ -3,7 +3,9 @@ import React, { useCallback } from 'react';
 
 
 export enum CanDoOperations {
-  transfer
+  transfer = 'transfer',
+  reject = 'reject',
+  approve = 'approve'
 }
 
 
@@ -25,6 +27,7 @@ export interface CanDoProps extends React.PropsWithChildren {
  */
 export function CanDo({ children, entity, operation, user }: CanDoProps) {
   const can = useCallback(() => {
+    // @ts-ignore no need to specify types for 100% mocked thing
     return PERMISSIONS_CONFIG[operation](user, entity);
   }, [ entity, operation, user ]);
 

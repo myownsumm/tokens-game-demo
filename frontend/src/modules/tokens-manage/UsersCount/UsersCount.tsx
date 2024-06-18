@@ -15,7 +15,7 @@ import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNotifications } from '@u-cat/u-notifications/dist/providers/u-notifications.provider';
 import { UserTokensAvailable } from '../tokens.typings.ts';
-import { RequestTransfer } from '../RequestTransfer/RequestTransfer.tsx';
+import { CreateTransferRequest } from '../CreateTransferRequest/CreateTransferRequest.tsx';
 
 
 export function UsersCount() {
@@ -59,7 +59,7 @@ export function UsersCount() {
   };
 
   const getTokensAvailable = useCallback((userId: string) => {
-    return tokensAvailable.find(i => i.userId === userId)?.tokens;
+    return tokensAvailable.find(i => i.id === userId)?.tokens;
   }, [ tokensAvailable ]);
 
   return (
@@ -107,7 +107,7 @@ export function UsersCount() {
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Request a transfer
           </Typography>
-          <RequestTransfer senderId={senderId} handleClose={handleClose}/>
+          <CreateTransferRequest senderId={senderId} handleClose={handleClose}/>
         </Box>
       </Modal>
     </>

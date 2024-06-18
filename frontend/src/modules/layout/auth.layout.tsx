@@ -24,7 +24,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuth } from '../auth/providers/auth.provider.tsx';
 import { UsersCount } from '../tokens-manage/UsersCount/UsersCount.tsx';
-import { TransferRequests } from '../tokens-manage/TransferRequests/TransferRequests.tsx';
+import { TransferRequestsList } from '../tokens-manage/TransferRequestsList/TransferRequestsList.tsx';
 
 
 function Copyright(props: any) {
@@ -201,7 +201,7 @@ const AuthLayout = ({ children }: React.PropsWithChildren) => {
                     minHeight: '70vh'
                   } }
                 >
-                  <TransferRequests/>
+                  <TransferRequestsList/>
                 </Paper>
               </Grid>
               <Grid item xs={ 12 } md={ 5 } lg={ 4 }>
