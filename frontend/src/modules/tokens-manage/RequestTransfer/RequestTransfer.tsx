@@ -15,7 +15,7 @@ export interface RequestTransferProps {
 
 
 export function RequestTransfer({ senderId, handleClose }: RequestTransferProps) {
-  const { danger } = useNotifications();
+  const { danger, info } = useNotifications();
   const validationSchema = Yup.object().shape({
     senderId: Yup.string().required('Sender is required'),
     recipientId: Yup.string().required('Recipient is required'),
@@ -34,6 +34,7 @@ export function RequestTransfer({ senderId, handleClose }: RequestTransferProps)
         axios.request({ method: 'POST', url: 'http://localhost:3000/tokens-transfers', data: values })
           .then(
             () => {
+              info('Transfer request created');
               handleClose();
             }
           )
