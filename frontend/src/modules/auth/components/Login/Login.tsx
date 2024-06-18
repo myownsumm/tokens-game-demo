@@ -1,80 +1,158 @@
-import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { useAuth } from '../../providers/auth.provider.tsx';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
-import { LoginData } from '../../auth.typings.ts';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Link from '@mui/material/Link';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
-import { USER_IAN_NAME, USER_JOHN_NAME, USER_KATE_NAME, USERS_TO_IDS } from '../../mock.ts';
+import { AuthPayload } from '../../auth.typings.ts';
+import { getUserByEmail } from '../../auth.mock.ts';
+import { useNotifications } from '@u-cat/u-notifications/dist/providers/u-notifications.provider';
+
+
+function Copyright(props: any) {
+  return (
+    <Typography variant="body2" color="text.secondary" align="center" { ...props }>
+      { 'Copyright © ' }
+      <Link color="inherit" href="https://mui.com/">
+        Your Website
+      </Link>{ ' ' }
+      { new Date().getFullYear() }
+      { '.' }
+    </Typography>
+  );
+}
+
+const defaultTheme = createTheme();
 
 
 export function Login() {
-  const { persistUserId } = useAuth();
   const navigate = useNavigate();
+  const { persistUser } = useAuth();
+  const { danger } = useNotifications();
 
   const validationSchema = Yup.object().shape({
+    email: Yup.string().email('Invalid email').required('Required'),
     password: Yup.string().required('Required')
   });
 
-  function login(data: LoginData): void {
-    persistUserId(data.userId)
+  function login(data: AuthPayload): void {
+    // Just for Demo purposes we are pulling mocked user in this way
+    const authUser = getUserByEmail(data.email);
+
+    if (!authUser) {
+      danger(`User ${ data.email } not found`);
+      return;
+    }
+
+    persistUser(authUser);
 
     navigate('/');
   }
 
   return (
     <>
-      <Formik
-        initialValues={ {
-          userId: '111',
-          password: ''
-        } }
-        validationSchema={ validationSchema }
-        onSubmit={ values => {
-          // same shape as initial values
-          login(values);
-        } }
-      >
-        { ({ errors, touched, values, setFieldValue }) => (
-          <Form>
-            <Grid container rowSpacing={ 2 } columnSpacing={ 2 } direction={ 'column' }
-                  justifyContent={ 'space-evenly' }
-                  alignItems={ 'center' }>
-              <Grid item xs={ 6 }>
-                <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">Name</InputLabel>
-                  <Select
-                    name="userId"
-                    labelId="demo-simple-select-label"
-                    defaultValue={ '111' }
-                    label="Name"
-                    onChange={ e => setFieldValue('userId', e.target.value) }
-                  >
-                    <MenuItem value={ USERS_TO_IDS[USER_JOHN_NAME] }>{ USER_JOHN_NAME }</MenuItem>
-                    <MenuItem value={ USERS_TO_IDS[USER_IAN_NAME] }>{ USER_IAN_NAME }</MenuItem>
-                    <MenuItem value={ USERS_TO_IDS[USER_KATE_NAME] }>{ USER_KATE_NAME }</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
+      <ThemeProvider theme={ defaultTheme }>
+        <Container component="main" maxWidth="xs">
+          <CssBaseline/>
+          <Box
+            sx={ {
+              marginTop: 8,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            } }
+          >
+            <Avatar sx={ { m: 1, bgcolor: 'secondary.main' } }>
+              <LockOutlinedIcon/>
+            </Avatar>
+            <Typography component="h1" variant="h5">
+              Sign in
+            </Typography>
 
-              <Grid item xs={ 6 }>
-                <TextField fullWidth error={ !!(touched.password && errors.password) }
-                           value={ values['password'] }
-                           name="password"
-                           label="Password"
-                           type={ 'password' }
-                           helperText={ touched.password && errors.password }
-                           onChange={ e => setFieldValue('password', e.target.value) }
-                           variant="outlined"/>
-              </Grid>
 
-              <Grid item xs={ 6 }>
-                <Button variant="contained" type={ 'submit' }>Login</Button>
-              </Grid>
-            </Grid>
-          </Form>
-        ) }
-      </Formik>
-      {/*</Grid>*/ }
+            <Formik
+              initialValues={ {
+                email: '',
+                password: ''
+              } }
+              validationSchema={ validationSchema }
+              onSubmit={ values => {
+                // same shape as initial values
+                login(values);
+              } }
+            >
+              { ({ errors, touched, values, setFieldValue }) => (
+                <Form>
+                  <Box sx={ { mt: 1 } }>
+                    <TextField
+                      margin="normal"
+                      fullWidth
+                      id="email"
+                      label="Email Address"
+                      name="email"
+                      autoComplete="email"
+                      autoFocus
+                      error={ !!(touched.email && errors.email) }
+                      value={ values['email'] }
+                      onChange={ e => setFieldValue('email', e.target.value) }
+                      helperText={ (touched.email && errors.email) || ' ' }
+                    />
+                    <TextField
+                      margin="normal"
+                      fullWidth
+                      name="password"
+                      label="Password"
+                      type="password"
+                      id="password"
+                      autoComplete="current-password"
+                      helperText={ (touched.password && errors.password) || ' ' }
+                      onChange={ e => setFieldValue('password', e.target.value) }
+                      error={ !!(touched.password && errors.password) }
+                    />
+                    <FormControlLabel
+                      disabled
+                      control={ <Checkbox value="remember" color="primary"/> }
+                      label="Remember me"
+                    />
+                    <Button
+                      type="submit"
+                      fullWidth
+                      variant="contained"
+                      sx={ { mt: 3, mb: 2 } }
+                    >
+                      Sign In
+                    </Button>
+                    <Grid container>
+                      <Grid item xs>
+                        <Link href="#" variant="body2">
+                          Forgot password?
+                        </Link>
+                      </Grid>
+                      <Grid item>
+                        <Link href="#" variant="body2">
+                          { 'Don\'t have an account? Sign Up' }
+                        </Link>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Form>
+              ) }
+            </Formik>
+          </Box>
+          <Copyright sx={ { mt: 8, mb: 4 } }/>
+        </Container>
+      </ThemeProvider>
     </>
   );
 }

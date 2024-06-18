@@ -5,20 +5,20 @@ import React, {
   useMemo,
   useState
 } from 'react';
+import { AuthUser } from '../auth.typings.ts';
 import axios from 'axios';
 
 
 interface IAuthContext {
-  userId: string | null;
-  persistUserId: (id: string | null) => void;
+  authUser: AuthUser | undefined;
+  // That's not a common thing to persist the whole user in this way.
+  // Secure way is to persist token (OAuth, JWT) and to fetch user info from BE
+  // for Demo purposes let's leave it as is.
+  persistUser: (u: AuthUser | undefined) => void;
 }
 
 
-const USER_ID_STORAGE_KEY = 'userId';
-
-
-// @ts-ignore
-const DEFAULT_AUTH_CONTEXT: IAuthContext = { userId: null, persistUserId: (id: string | null) => undefined };
+const DEFAULT_AUTH_CONTEXT: IAuthContext = { authUser: undefined, persistUser: () => undefined };
 const AuthContext = createContext(DEFAULT_AUTH_CONTEXT);
 
 export const useAuth = () => {
@@ -26,28 +26,30 @@ export const useAuth = () => {
 };
 
 const AuthProvider = ({ children }: React.PropsWithChildren) => {
-  const [ userId, setUserId ] = useState(localStorage.getItem(USER_ID_STORAGE_KEY));
+  const persistedAuthUserString = localStorage.getItem('authUser');
+  const [ authUser, setAuthUser ] = useState(
+    persistedAuthUserString ? JSON.parse(persistedAuthUserString) as AuthUser : undefined
+  );
 
-  function persistUserId(id: string | null): void {
-    id ? localStorage.setItem(USER_ID_STORAGE_KEY, id) : localStorage.removeItem('userId')
-
-    setUserId(id);
+  function persistUser(u: AuthUser | undefined): void {
+    u ? localStorage.setItem('authUser', JSON.stringify(u)) : localStorage.removeItem('authUser');
+    setAuthUser(u);
   }
 
   useEffect(() => {
-    if (userId) {
-      axios.defaults.headers.common['UserId'] = userId;
+    if (authUser) {
+      axios.defaults.headers.common['Authorization'] = JSON.stringify(authUser);
     } else {
-      delete axios.defaults.headers.common['UserId'];
+      delete axios.defaults.headers.common['Authorization'];
     }
-  }, [ userId ]);
+  }, [ authUser ]);
 
   const contextValue = useMemo(
     () => ({
-      userId,
-      persistUserId
+      authUser,
+      persistUser
     }),
-    [ userId ]
+    [ authUser ]
   );
 
   return <AuthContext.Provider value={ contextValue }>

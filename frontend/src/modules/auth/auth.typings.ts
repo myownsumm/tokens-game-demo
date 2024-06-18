@@ -1,4 +1,9 @@
-export interface LoginData {
-  userId: string;
+export interface AuthPayload {
+  email: string;
   password: string;
+}
+
+export interface AuthUser {
+  email: string;
+  id: string;
 }

@@ -4,10 +4,10 @@ import { useAuth } from '../modules/auth/providers/auth.provider.tsx';
 
 
 export const ProtectedRoute = (props: React.PropsWithChildren) => {
-  const { userId } = useAuth();
+  const { authUser } = useAuth();
 
   // Check if the user is authenticated
-  if (!userId) {
+  if (!authUser) {
     // If not authenticated, redirect to the login page
     return <Navigate to="/login"/>;
   }
