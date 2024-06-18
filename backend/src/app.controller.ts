@@ -30,11 +30,9 @@ export class AppController {
 
   @Get()
   getHello(): string {
-    // setInterval(() => {
-    //   this.eventsGateway.sendMessageToAll();
-    // }, 1000);
-
-    // TOKENS_AVAILABLE.find(ta => ta.userId === '111').tokens = 5;
+    setInterval(() => {
+      this.eventsGateway.sendMessageToAll();
+    }, 1000);
 
     return this.appService.getHello();
   }

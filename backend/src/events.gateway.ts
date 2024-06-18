@@ -5,6 +5,7 @@ import {
   WebSocketServer
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { v4 as uuidv4 } from 'uuid';
 
 
 @WebSocketGateway(81, {
@@ -40,6 +41,6 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   }
 
   sendMessageToAll() {
-    this.server.emit('events','{message to all}')
+    this.server.emit('events', JSON.stringify({ text: 'text here', id: uuidv4() }))
   }
 }
