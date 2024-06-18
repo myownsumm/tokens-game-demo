@@ -11,14 +11,40 @@ import { useAuth } from '../../auth/providers/auth.provider.tsx';
 import Box from '@mui/material/Box';
 import { CanDo, CanDoOperations } from '../../permissions-control/components/CanDo.tsx';
 import { AUTH_USERS } from '../../auth/auth.mock.ts';
+import { useCallback, useEffect, useState } from 'react';
+import axios from 'axios';
+import { useNotifications } from '@u-cat/u-notifications/dist/providers/u-notifications.provider';
+import { UserTokensAvailable } from '../tokens.typings.ts';
+import { RequestTransfer } from '../RequestTransfer/RequestTransfer.tsx';
 
 
 export function UsersCount() {
   const { authUser } = useAuth();
+  const { danger } = useNotifications();
 
-  const [ open, setOpen ] = React.useState(false);
-  const handleOpen = () => setOpen(true);
+  const [ open, setOpen ] = useState(false);
+  const [ senderId, setSenderId ] = useState('');
+
+  const handleOpen = (senderId: string) => {
+    setSenderId(senderId);
+    setOpen(true);
+  }
   const handleClose = () => setOpen(false);
+
+  const [ tokensAvailable, setTokensAvailable ] = useState<UserTokensAvailable[]>([]);
+
+  useEffect(() => {
+    axios.request({ method: 'GET', url: 'http://localhost:3000/users-tokens' })
+      .then(
+        response => {
+          setTokensAvailable(response.data);
+        }
+      )
+      .catch(() => {
+        danger('Problem occurred while trying to fetch Tokens available list.');
+      })
+  }, [ authUser ]);
+
 
   const style = {
     position: 'absolute' as 'absolute',
@@ -32,11 +58,15 @@ export function UsersCount() {
     p: 4
   };
 
+  const getTokensAvailable = useCallback((userId: string) => {
+    return tokensAvailable.find(i => i.userId === userId)?.tokens;
+  }, [ tokensAvailable ]);
+
   return (
     <>
       <List sx={ { width: '100%', maxWidth: 360, bgcolor: 'background.paper' } }>
         { AUTH_USERS.map((user) => (
-          <div key={user.id}>
+          <div key={ user.id }>
             <ListItem alignItems="flex-start">
               <ListItemAvatar>
                 <Avatar alt={ user.email } src={ user.avatar }/>
@@ -51,12 +81,12 @@ export function UsersCount() {
                       variant="body2"
                       color="text.primary"
                     >
-                      10 tokens
+                      { `${ getTokensAvailable(user.id) } tokens` }
                     </Typography>
                     <CanDo operation={ CanDoOperations.transfer }
                            user={ authUser! }
                            entity={ user }>
-                      <Button onClick={ handleOpen }>Transfer</Button>
+                      <Button onClick={ () => handleOpen(user.id) }>Transfer</Button>
                     </CanDo>
                   </React.Fragment>
                 }
@@ -75,11 +105,9 @@ export function UsersCount() {
       >
         <Box sx={ style }>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Text in a modal
+            Request a transfer
           </Typography>
-          <Typography id="modal-modal-description" sx={ { mt: 2 } }>
-            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-          </Typography>
+          <RequestTransfer senderId={senderId} handleClose={handleClose}/>
         </Box>
       </Modal>
     </>
