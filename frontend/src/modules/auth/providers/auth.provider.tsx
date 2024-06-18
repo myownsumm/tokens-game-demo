@@ -5,15 +5,20 @@ import React, {
   useMemo,
   useState
 } from 'react';
+import { AuthUser } from '../auth.typings.ts';
+import axios from 'axios';
 
 
 interface IAuthContext {
-  token: string | null;
-  persistToken: (token: string | null, remember?: boolean) => void;
+  authUser: AuthUser | undefined;
+  // That's not a common thing to persist the whole user in this way.
+  // Secure way is to persist token (OAuth, JWT) and to fetch user info from BE
+  // for Demo purposes let's leave it as is.
+  persistUser: (u: AuthUser | undefined) => void;
 }
 
 
-const DEFAULT_AUTH_CONTEXT: IAuthContext = { token: null, persistToken: () => undefined };
+const DEFAULT_AUTH_CONTEXT: IAuthContext = { authUser: undefined, persistUser: () => undefined };
 const AuthContext = createContext(DEFAULT_AUTH_CONTEXT);
 
 export const useAuth = () => {
@@ -21,62 +26,30 @@ export const useAuth = () => {
 };
 
 const AuthProvider = ({ children }: React.PropsWithChildren) => {
-  // const { addNotification } = useNotifications();
-  // const navigate = useNavigate();
+  const persistedAuthUserString = localStorage.getItem('authUser');
+  const [ authUser, setAuthUser ] = useState(
+    persistedAuthUserString ? JSON.parse(persistedAuthUserString) as AuthUser : undefined
+  );
 
-  // Component content goes here
-  const [ token, setToken ] = useState(localStorage.getItem('token'));
-
-  function persistToken(token: string | null, remember = true): void {
-    if (remember && token) {
-      localStorage.setItem('token', token);
-    }
-
-    if (!token) {
-      localStorage.removeItem('token')
-    }
-
-    setToken(token);
+  function persistUser(u: AuthUser | undefined): void {
+    u ? localStorage.setItem('authUser', JSON.stringify(u)) : localStorage.removeItem('authUser');
+    setAuthUser(u);
   }
 
   useEffect(() => {
-    // TODO. start using Axios for http requests
-    if (token) {
-      // axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    if (authUser) {
+      axios.defaults.headers.common['Authorization'] = JSON.stringify(authUser);
     } else {
-      // delete axios.defaults.headers.common['Authorization'];
+      delete axios.defaults.headers.common['Authorization'];
     }
-  }, [ token ]);
-
-  // Check if Auth user is still valid
-  useEffect(() => {
-    if (!token) {
-      return;
-    }
-
-    // const url = `${ process.env.NX_PUBLIC_USERS_API_URL }/users/me`;
-
-    // axios.request({ method: 'GET', url })
-    //   .then(
-    //     response => {
-    //       // TODO. use this User data for something? ACL/RBAC? avatar?
-    //     }
-    //   )
-    //   .catch(err => {
-    //     if (err.response.status === 404) {
-    //       persistToken(null);
-    //       navigate('/');
-    //     }
-    //     addNotification(UNotificationColor.danger, 'Problem occurred while trying to validate User authenticated.');
-    //   })
-  }, [ token ]);
+  }, [ authUser ]);
 
   const contextValue = useMemo(
     () => ({
-      token,
-      persistToken
+      authUser,
+      persistUser
     }),
-    [ token ]
+    [ authUser ]
   );
 
   return <AuthContext.Provider value={ contextValue }>
