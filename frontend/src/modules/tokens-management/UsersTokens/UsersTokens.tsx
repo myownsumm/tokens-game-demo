@@ -18,7 +18,7 @@ import { UserTokensAvailable } from '../tokens.typings.ts';
 import { CreateTransferRequest } from '../CreateTransferRequest/CreateTransferRequest.tsx';
 
 
-export function UsersCount() {
+export function UsersTokens() {
   const { authUser } = useAuth();
   const { danger } = useNotifications();
 
@@ -107,7 +107,7 @@ export function UsersCount() {
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Request a transfer
           </Typography>
-          <CreateTransferRequest senderId={senderId} handleClose={handleClose}/>
+          <CreateTransferRequest senderId={ senderId } handleClose={ handleClose }/>
         </Box>
       </Modal>
     </>
