@@ -70,6 +70,8 @@ export class AppController {
     tokenTransfer.status = 'pending';
 
     TOKENS_TRANSFERS_MAP.set(uuidv4(), tokenTransfer);
+
+    this.eventsGateway.sendMessageToAll({action: 'TOKEN_TRANSFER_CREATED'});
   }
 
   @Put('/tokens-transfers/:id/approve')

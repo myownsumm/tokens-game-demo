@@ -40,7 +40,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     this.server.emit('events', payload);
   }
 
-  sendMessageToAll() {
-    this.server.emit('events', JSON.stringify({ text: 'text here', id: uuidv4() }))
+  sendMessageToAll(message: object = {}) {
+    this.server.emit('events', JSON.stringify({ ...message, id: uuidv4() }))
   }
 }

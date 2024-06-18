@@ -6,26 +6,23 @@ import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Button from '@mui/material/Button';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
+import { useMessages } from '../../providers/messages.provider.tsx';
 
 
 export function SocketsConnector() {
+  const { messages, addMessage, clearMessages } = useMessages();
   const [ isConnected, setIsConnected ] = useState(socket.connected);
-  const [ events, setEvents ] = useState([]);
-
   const [ open, setOpen ] = React.useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
   };
 
-  const handleClose = (clearMessages?: boolean) => {
+  const handleClose = (clear?: boolean) => {
     setOpen(false);
 
-    if (clearMessages) {
-      setEvents([]);
+    if (clear) {
+      clearMessages();
     }
   };
 
@@ -50,9 +47,8 @@ export function SocketsConnector() {
       setIsConnected(false);
     }
 
-    function onEvent(value) {
-      // TODO. handle actions here later
-      setEvents(previous => [ ...previous, value ]);
+    function onEvent(value: string) {
+      addMessage(JSON.parse(value));
     }
 
     socket.on('connect', onConnect);
@@ -73,7 +69,7 @@ export function SocketsConnector() {
       } label={ `Real Time: ${ isConnected ? 'Connected' : 'Disconnected' }` }/>
 
       <IconButton color="inherit" onClick={ handleClickOpen }>
-        <Badge badgeContent={ events.length } color="secondary">
+        <Badge badgeContent={ messages.length } color="secondary">
           <NotificationsIcon/>
         </Badge>
       </IconButton>
@@ -88,11 +84,12 @@ export function SocketsConnector() {
           { 'Real Time messages list' }
         </DialogTitle>
         <DialogContent>
-          <DialogContentText component={'div'} id="alert-dialog-description" minWidth={ '600px' } minHeight={ '200px' }
+          <DialogContentText component={ 'div' } id="alert-dialog-description" minWidth={ '600px' }
+                             minHeight={ '200px' }
                              maxHeight={ '200px' }>
             <Stack component="div">
-              { events.map(event =>
-                <p key={ JSON.stringify(event) }>{ event }</p>
+              { messages.map(event =>
+                <p key={ event.id }>{ JSON.stringify(event) }</p>
               ) }
             </Stack>
           </DialogContentText>

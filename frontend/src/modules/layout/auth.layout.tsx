@@ -17,8 +17,9 @@ import ListItemText from '@mui/material/ListItemText';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuth } from '../auth/providers/auth.provider.tsx';
-import { SocketsConnector } from '../websockets/components/SocketsConnector/SocketsConnector.tsx';
+import { SocketsConnector } from '../messages/components/SocketsConnector/SocketsConnector.tsx';
 import Avatar from '@mui/material/Avatar';
+import MessagesProvider from '../messages/providers/messages.provider.tsx';
 
 
 const drawerWidth: number = 240;
@@ -88,89 +89,91 @@ const AuthLayout = ({ children }: React.PropsWithChildren) => {
   }
 
   return (
-    <ThemeProvider theme={ defaultTheme }>
-      <Box sx={ { display: 'flex' } }>
-        <CssBaseline/>
-        <AppBar position="absolute" open={ open }>
-          <Toolbar
-            sx={ {
-              pr: '24px' // keep right padding when drawer closed
-            } }
-          >
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="open drawer"
-              onClick={ toggleDrawer }
+    <MessagesProvider>
+      <ThemeProvider theme={ defaultTheme }>
+        <Box sx={ { display: 'flex' } }>
+          <CssBaseline/>
+          <AppBar position="absolute" open={ open }>
+            <Toolbar
               sx={ {
-                marginRight: '36px',
-                ...(open && { display: 'none' })
+                pr: '24px' // keep right padding when drawer closed
               } }
             >
-              <MenuIcon/>
-            </IconButton>
-            <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-              sx={ { flexGrow: 1 } }
-            >
-              Dapp - Penalty
-            </Typography>
-            <SocketsConnector/>
+              <IconButton
+                edge="start"
+                color="inherit"
+                aria-label="open drawer"
+                onClick={ toggleDrawer }
+                sx={ {
+                  marginRight: '36px',
+                  ...(open && { display: 'none' })
+                } }
+              >
+                <MenuIcon/>
+              </IconButton>
+              <Typography
+                component="h1"
+                variant="h6"
+                color="inherit"
+                noWrap
+                sx={ { flexGrow: 1 } }
+              >
+                Dapp - Penalty
+              </Typography>
+              <SocketsConnector/>
 
-            <Avatar sx={ { m: 2, bgcolor: 'secondary.main' } } alt={authUser?.email} src={ authUser?.avatar } />
-          </Toolbar>
-        </AppBar>
-        <Drawer variant="permanent" open={ open }>
-          <Toolbar
+              <Avatar sx={ { m: 2, bgcolor: 'secondary.main' } } alt={ authUser?.email } src={ authUser?.avatar }/>
+            </Toolbar>
+          </AppBar>
+          <Drawer variant="permanent" open={ open }>
+            <Toolbar
+              sx={ {
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                px: [ 1 ]
+              } }
+            >
+              <IconButton onClick={ toggleDrawer }>
+                <ChevronLeftIcon/>
+              </IconButton>
+            </Toolbar>
+            <Divider/>
+            <List component="nav">
+              <React.Fragment>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <DashboardIcon/>
+                  </ListItemIcon>
+                  <ListItemText primary="Dashboard"/>
+                </ListItemButton>
+                <ListItemButton onClick={ logout }>
+                  <ListItemIcon>
+                    <LogoutIcon/>
+                  </ListItemIcon>
+                  <ListItemText primary="Logout"/>
+                </ListItemButton>
+              </React.Fragment>
+            </List>
+          </Drawer>
+          <Box
+            component="main"
             sx={ {
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              px: [ 1 ]
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'light'
+                  ? theme.palette.grey[100]
+                  : theme.palette.grey[900],
+              flexGrow: 1,
+              height: '100vh',
+              overflow: 'auto'
             } }
           >
-            <IconButton onClick={ toggleDrawer }>
-              <ChevronLeftIcon/>
-            </IconButton>
-          </Toolbar>
-          <Divider/>
-          <List component="nav">
-            <React.Fragment>
-              <ListItemButton>
-                <ListItemIcon>
-                  <DashboardIcon/>
-                </ListItemIcon>
-                <ListItemText primary="Dashboard"/>
-              </ListItemButton>
-              <ListItemButton onClick={ logout }>
-                <ListItemIcon>
-                  <LogoutIcon/>
-                </ListItemIcon>
-                <ListItemText primary="Logout"/>
-              </ListItemButton>
-            </React.Fragment>
-          </List>
-        </Drawer>
-        <Box
-          component="main"
-          sx={ {
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'light'
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
-            flexGrow: 1,
-            height: '100vh',
-            overflow: 'auto'
-          } }
-        >
-          <Toolbar/>
-          {children}
+            <Toolbar/>
+            { children }
+          </Box>
         </Box>
-      </Box>
-    </ThemeProvider>
+      </ThemeProvider>
+    </MessagesProvider>
   );
 };
 
