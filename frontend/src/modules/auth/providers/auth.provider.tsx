@@ -5,15 +5,20 @@ import React, {
   useMemo,
   useState
 } from 'react';
+import axios from 'axios';
 
 
 interface IAuthContext {
-  token: string | null;
-  persistToken: (token: string | null, remember?: boolean) => void;
+  userId: string | null;
+  persistUserId: (id: string | null) => void;
 }
 
 
-const DEFAULT_AUTH_CONTEXT: IAuthContext = { token: null, persistToken: () => undefined };
+const USER_ID_STORAGE_KEY = 'userId';
+
+
+// @ts-ignore
+const DEFAULT_AUTH_CONTEXT: IAuthContext = { userId: null, persistUserId: (id: string | null) => undefined };
 const AuthContext = createContext(DEFAULT_AUTH_CONTEXT);
 
 export const useAuth = () => {
@@ -21,62 +26,28 @@ export const useAuth = () => {
 };
 
 const AuthProvider = ({ children }: React.PropsWithChildren) => {
-  // const { addNotification } = useNotifications();
-  // const navigate = useNavigate();
+  const [ userId, setUserId ] = useState(localStorage.getItem(USER_ID_STORAGE_KEY));
 
-  // Component content goes here
-  const [ token, setToken ] = useState(localStorage.getItem('token'));
+  function persistUserId(id: string | null): void {
+    id ? localStorage.setItem(USER_ID_STORAGE_KEY, id) : localStorage.removeItem('userId')
 
-  function persistToken(token: string | null, remember = true): void {
-    if (remember && token) {
-      localStorage.setItem('token', token);
-    }
-
-    if (!token) {
-      localStorage.removeItem('token')
-    }
-
-    setToken(token);
+    setUserId(id);
   }
 
   useEffect(() => {
-    // TODO. start using Axios for http requests
-    if (token) {
-      // axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    if (userId) {
+      axios.defaults.headers.common['UserId'] = userId;
     } else {
-      // delete axios.defaults.headers.common['Authorization'];
+      delete axios.defaults.headers.common['UserId'];
     }
-  }, [ token ]);
-
-  // Check if Auth user is still valid
-  useEffect(() => {
-    if (!token) {
-      return;
-    }
-
-    // const url = `${ process.env.NX_PUBLIC_USERS_API_URL }/users/me`;
-
-    // axios.request({ method: 'GET', url })
-    //   .then(
-    //     response => {
-    //       // TODO. use this User data for something? ACL/RBAC? avatar?
-    //     }
-    //   )
-    //   .catch(err => {
-    //     if (err.response.status === 404) {
-    //       persistToken(null);
-    //       navigate('/');
-    //     }
-    //     addNotification(UNotificationColor.danger, 'Problem occurred while trying to validate User authenticated.');
-    //   })
-  }, [ token ]);
+  }, [ userId ]);
 
   const contextValue = useMemo(
     () => ({
-      token,
-      persistToken
+      userId,
+      persistUserId
     }),
-    [ token ]
+    [ userId ]
   );
 
   return <AuthContext.Provider value={ contextValue }>

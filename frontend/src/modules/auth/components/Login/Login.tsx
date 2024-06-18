@@ -1,39 +1,31 @@
-import { Button, Grid, TextField } from '@mui/material';
+import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { useAuth } from '../../providers/auth.provider.tsx';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
-import { Api } from '../../../../api/api.ts';
+import { LoginData } from '../../auth.typings.ts';
+import { useNavigate } from 'react-router-dom';
+import { USER_IAN_NAME, USER_JOHN_NAME, USER_KATE_NAME, USERS_TO_IDS } from '../../mock.ts';
 
 
 export function Login() {
-  // const actionUrl = `${ process.env.NX_PUBLIC_AUTH_API_URL }/auth/login`;
-  // const actionMethod = 'POST';
-
-  // const { persistToken } = useAuth();
-  // const { addNotification } = useNotifications();
-  //
-  // const navigate = useNavigate();
+  const { persistUserId } = useAuth();
+  const navigate = useNavigate();
 
   const validationSchema = Yup.object().shape({
-    email: Yup.string().email('Invalid email').required('Required'),
     password: Yup.string().required('Required')
   });
 
-  function login(data: { email: string, password: string }): void {
-    const api = new Api();
-    api.login(data);
+  function login(data: LoginData): void {
+    persistUserId(data.userId)
 
-    const { persistToken } = useAuth();
-    persistToken('123123')
-
-    console.log('login', data);
+    navigate('/');
   }
 
   return (
     <>
       <Formik
         initialValues={ {
-          email: '',
+          userId: '111',
           password: ''
         } }
         validationSchema={ validationSchema }
@@ -48,11 +40,20 @@ export function Login() {
                   justifyContent={ 'space-evenly' }
                   alignItems={ 'center' }>
               <Grid item xs={ 6 }>
-                <TextField fullWidth name="email" label="Email" variant="outlined"
-                           error={ !!(touched.email && errors.email) }
-                           value={ values['email'] }
-                           onChange={ e => setFieldValue('email', e.target.value) }
-                           helperText={ touched.email && errors.email }/>
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">Name</InputLabel>
+                  <Select
+                    name="userId"
+                    labelId="demo-simple-select-label"
+                    defaultValue={ '111' }
+                    label="Name"
+                    onChange={ e => setFieldValue('userId', e.target.value) }
+                  >
+                    <MenuItem value={ USERS_TO_IDS[USER_JOHN_NAME] }>{ USER_JOHN_NAME }</MenuItem>
+                    <MenuItem value={ USERS_TO_IDS[USER_IAN_NAME] }>{ USER_IAN_NAME }</MenuItem>
+                    <MenuItem value={ USERS_TO_IDS[USER_KATE_NAME] }>{ USER_KATE_NAME }</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
 
               <Grid item xs={ 6 }>
