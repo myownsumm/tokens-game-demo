@@ -9,37 +9,17 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuth } from '../auth/providers/auth.provider.tsx';
-import { UsersCount } from '../tokens-manage/UsersCount/UsersCount.tsx';
-import { TransferRequestsList } from '../tokens-manage/TransferRequestsList/TransferRequestsList.tsx';
 import { SocketsConnector } from '../websockets/components/SocketsConnector/SocketsConnector.tsx';
+import Avatar from '@mui/material/Avatar';
 
-
-function Copyright(props: any) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" { ...props }>
-      { 'Copyright © ' }
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{ ' ' }
-      { new Date().getFullYear() }
-      { '.' }
-    </Typography>
-  );
-}
 
 const drawerWidth: number = 240;
 
@@ -101,7 +81,7 @@ const AuthLayout = ({ children }: React.PropsWithChildren) => {
     setOpen(!open);
   };
 
-  const { persistUser } = useAuth();
+  const { persistUser, authUser } = useAuth();
 
   function logout(): void {
     persistUser(undefined);
@@ -138,7 +118,8 @@ const AuthLayout = ({ children }: React.PropsWithChildren) => {
             >
               Dapp - Penalty
             </Typography>
-            <SocketsConnector />
+            <SocketsConnector/>
+            <Avatar alt={authUser?.email} src={ authUser?.avatar } />
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={ open }>
@@ -185,38 +166,7 @@ const AuthLayout = ({ children }: React.PropsWithChildren) => {
           } }
         >
           <Toolbar/>
-
-          <Container maxWidth="lg" sx={ { mt: 4, mb: 4 } }>
-            <Grid container spacing={ 3 }>
-              <Grid item xs={ 12 } md={ 7 } lg={ 8 }>
-                <Paper
-                  sx={ {
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 'auto',
-                    minHeight: '70vh'
-                  } }
-                >
-                  <TransferRequestsList/>
-                </Paper>
-              </Grid>
-              <Grid item xs={ 12 } md={ 5 } lg={ 4 }>
-                <Paper
-                  sx={ {
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 'auto',
-                    minHeight: '70vh'
-                  } }
-                >
-                  <UsersCount/>
-                </Paper>
-              </Grid>
-            </Grid>
-            <Copyright sx={ { pt: 4 } }/>
-          </Container>
+          {children}
         </Box>
       </Box>
     </ThemeProvider>

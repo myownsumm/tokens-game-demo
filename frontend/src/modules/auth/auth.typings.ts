@@ -3,7 +3,9 @@ export interface AuthPayload {
   password: string;
 }
 
+
 export interface AuthUser {
   email: string;
   id: string;
+  avatar: string;
 }
