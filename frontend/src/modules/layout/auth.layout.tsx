@@ -25,6 +25,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuth } from '../auth/providers/auth.provider.tsx';
 import { UsersCount } from '../tokens-manage/UsersCount/UsersCount.tsx';
 import { TransferRequestsList } from '../tokens-manage/TransferRequestsList/TransferRequestsList.tsx';
+import { SocketsConnector } from '../websockets/components/SocketsConnector/SocketsConnector.tsx';
 
 
 function Copyright(props: any) {
@@ -137,11 +138,7 @@ const AuthLayout = ({ children }: React.PropsWithChildren) => {
             >
               Dapp - Penalty
             </Typography>
-            <IconButton color="inherit">
-              <Badge badgeContent={ 4 } color="secondary">
-                <NotificationsIcon/>
-              </Badge>
-            </IconButton>
+            <SocketsConnector />
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={ open }>
