@@ -15,6 +15,7 @@ import { getUserById } from '../../auth/auth.mock.ts';
 import Button from '@mui/material/Button';
 import { CanDo, CanDoOperations } from '../../permissions-control/components/CanDo.tsx';
 import { useAuth } from '../../auth/providers/auth.provider.tsx';
+import { useMessages } from '../../messages/providers/messages.provider.tsx';
 
 
 export function TransferRequestsList() {
@@ -25,6 +26,8 @@ export function TransferRequestsList() {
   const [ open, setOpen ] = useState(false);
   const [ operation, setOperation ] = useState<CanDoOperations>();
   const [ entityId, setEntityId ] = useState<string>();
+
+  const { messages } = useMessages();
 
   const handleClickOpen = (operation: CanDoOperations, id: string) => {
     setOpen(true);
@@ -60,7 +63,8 @@ export function TransferRequestsList() {
       })
   }
 
-  useEffect(() => fetchTransferRequestsList(), []);
+  // Listening to messages to demonstrate Real Time update possibilities.
+  useEffect(() => fetchTransferRequestsList(), [ messages ]);
 
   return (
     <>
