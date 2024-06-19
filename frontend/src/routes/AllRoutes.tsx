@@ -3,6 +3,7 @@ import { Dashboard } from '../modules/tokens-management/Dashboard/Dashboard.tsx'
 
 
 const authProtectedRoutes = [
+  { path: '/', element: <Dashboard/> },
   { path: '/dashboard', element: <Dashboard/> }
 ]
 const guestRoutes = [
