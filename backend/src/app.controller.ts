@@ -71,7 +71,7 @@ export class AppController {
 
     TOKENS_TRANSFERS_MAP.set(uuidv4(), tokenTransfer);
 
-    this.eventsGateway.sendMessageToAll({action: 'TOKEN_TRANSFER_CREATED'});
+    this.eventsGateway.sendMessageToAll({ action: 'TOKEN_TRANSFER_CREATED' });
   }
 
   @Put('/tokens-transfers/:id/approve')
@@ -96,10 +96,14 @@ export class AppController {
     senderTokensAvailable.tokens -= Number(transfer.amount);
     recipientTokensAvailable.tokens += Number(transfer.amount);
     transfer.status = 'approved';
+
+    this.eventsGateway.sendMessageToAll({ action: 'TOKEN_TRANSFER_APPROVED' });
   }
 
   @Put('/tokens-transfers/:id/reject')
   rejectTokenTransfer(@Param('id') id: string) {
     TOKENS_TRANSFERS_MAP.get(id).status = 'rejected';
+
+    this.eventsGateway.sendMessageToAll({ action: 'TOKEN_TRANSFER_REJECTED' });
   }
 }

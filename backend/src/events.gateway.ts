@@ -40,6 +40,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     this.server.emit('events', payload);
   }
 
+  // TODO. Used for Real time FE updates demonstration
   sendMessageToAll(message: object = {}) {
     this.server.emit('events', JSON.stringify({ ...message, id: uuidv4() }))
   }

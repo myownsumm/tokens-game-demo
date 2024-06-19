@@ -16,6 +16,7 @@ import axios from 'axios';
 import { useNotifications } from '@u-cat/u-notifications/dist/providers/u-notifications.provider';
 import { UserTokensAvailable } from '../tokens.typings.ts';
 import { CreateTransferRequest } from '../CreateTransferRequest/CreateTransferRequest.tsx';
+import { useMessages } from '../../messages/providers/messages.provider.tsx';
 
 
 export function UsersTokens() {
@@ -25,6 +26,8 @@ export function UsersTokens() {
   const [ open, setOpen ] = useState(false);
   const [ senderId, setSenderId ] = useState('');
 
+  const { messages } = useMessages();
+
   const handleOpen = (senderId: string) => {
     setSenderId(senderId);
     setOpen(true);
@@ -33,7 +36,7 @@ export function UsersTokens() {
 
   const [ tokensAvailable, setTokensAvailable ] = useState<UserTokensAvailable[]>([]);
 
-  useEffect(() => {
+  function fetchUsersTokens(): void {
     axios.request({ method: 'GET', url: 'http://localhost:3000/users-tokens' })
       .then(
         response => {
@@ -43,8 +46,10 @@ export function UsersTokens() {
       .catch(() => {
         danger('Problem occurred while trying to fetch Tokens available list.');
       })
-  }, [ authUser ]);
+  }
 
+  // Listening to messages to demonstrate Real Time update possibilities.
+  useEffect(() => fetchUsersTokens(), [ authUser, messages ]);
 
   const style = {
     position: 'absolute' as 'absolute',

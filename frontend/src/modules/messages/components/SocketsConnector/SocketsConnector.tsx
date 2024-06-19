@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { socket } from '../../socket.ts';
+import React, { useState } from 'react';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack, Switch } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
@@ -10,9 +9,8 @@ import { useMessages } from '../../providers/messages.provider.tsx';
 
 
 export function SocketsConnector() {
-  const { messages, addMessage, clearMessages } = useMessages();
-  const [ isConnected, setIsConnected ] = useState(socket.connected);
-  const [ open, setOpen ] = React.useState(false);
+  const { messages, clearMessages, connect, disconnect, isConnected } = useMessages();
+  const [ open, setOpen ] = useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -26,41 +24,9 @@ export function SocketsConnector() {
     }
   };
 
-  function connect() {
-    socket.connect();
-  }
-
-  function disconnect() {
-    socket.disconnect();
-  }
-
   function onSwitchChangeHandler(e: React.ChangeEvent<HTMLInputElement>) {
     e.target.checked ? connect() : disconnect();
   }
-
-  useEffect(() => {
-    function onConnect() {
-      setIsConnected(true);
-    }
-
-    function onDisconnect() {
-      setIsConnected(false);
-    }
-
-    function onEvent(value: string) {
-      addMessage(JSON.parse(value));
-    }
-
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-    socket.on('events', onEvent);
-
-    return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-      socket.off('events', onEvent);
-    };
-  }, []);
 
   return (
     <>
