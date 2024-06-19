@@ -1,10 +1,16 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
-import { AppService } from './app.service';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
 import { EventsGateway } from './events.gateway';
 import { v4 as uuidv4 } from 'uuid';
-
 
 const USERS_TOKENS_MAP = new Map();
 USERS_TOKENS_MAP.set('111', { tokens: 10 });
@@ -12,36 +18,44 @@ USERS_TOKENS_MAP.set('222', { tokens: 10 });
 USERS_TOKENS_MAP.set('333', { tokens: 10 });
 USERS_TOKENS_MAP.set('444', { tokens: 10 });
 
-
 const TOKENS_TRANSFERS_MAP = new Map();
-TOKENS_TRANSFERS_MAP.set(uuidv4(), { senderId: '111', recipientId: '222', amount: 5, status: 'pending' });
-TOKENS_TRANSFERS_MAP.set(uuidv4(), { senderId: '222', recipientId: '333', amount: 5, status: 'pending' });
-TOKENS_TRANSFERS_MAP.set(uuidv4(), { senderId: '444', recipientId: '111', amount: 5, status: 'pending' });
-TOKENS_TRANSFERS_MAP.set(uuidv4(), { senderId: '444', recipientId: '111', amount: 5, status: 'pending' });
-
+TOKENS_TRANSFERS_MAP.set(uuidv4(), {
+  senderId: '111',
+  recipientId: '222',
+  amount: 5,
+  status: 'pending',
+});
+TOKENS_TRANSFERS_MAP.set(uuidv4(), {
+  senderId: '222',
+  recipientId: '333',
+  amount: 5,
+  status: 'pending',
+});
+TOKENS_TRANSFERS_MAP.set(uuidv4(), {
+  senderId: '444',
+  recipientId: '111',
+  amount: 5,
+  status: 'pending',
+});
+TOKENS_TRANSFERS_MAP.set(uuidv4(), {
+  senderId: '444',
+  recipientId: '111',
+  amount: 5,
+  status: 'pending',
+});
 
 @Controller()
 export class AppController {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly appService: AppService, private readonly eventsGateway: EventsGateway) {
-  }
-
-  @Get()
-  getHello(): string {
-    setInterval(() => {
-      this.eventsGateway.sendMessageToAll();
-    }, 1000);
-
-    return this.appService.getHello();
-  }
+  constructor(private readonly eventsGateway: EventsGateway) {}
 
   @Get('/users-tokens')
   getUsersTokens() {
     const list = [];
 
-    for (let [ id, value ] of USERS_TOKENS_MAP) {
+    for (const [id, value] of USERS_TOKENS_MAP) {
       list.push({ id, ...value });
     }
 
@@ -52,7 +66,7 @@ export class AppController {
   getTokenTransfers() {
     const list = [];
 
-    for (let [ id, value ] of TOKENS_TRANSFERS_MAP) {
+    for (const [id, value] of TOKENS_TRANSFERS_MAP) {
       list.push({ id, ...value });
     }
 
@@ -61,10 +75,14 @@ export class AppController {
 
   @Post('/tokens-transfers')
   createTokenTransfer(@Body() tokenTransfer: any) {
-    const userAvailableTokens = USERS_TOKENS_MAP.get(tokenTransfer.senderId)?.tokens;
+    const userAvailableTokens = USERS_TOKENS_MAP.get(
+      tokenTransfer.senderId,
+    )?.tokens;
 
     if (!userAvailableTokens || userAvailableTokens < tokenTransfer.amount) {
-      throw new BadRequestException(`Token transfer could not be created: Recipient has no such amount of tokens.`);
+      throw new BadRequestException(
+        `Token transfer could not be created: Recipient has no such amount of tokens.`,
+      );
     }
 
     tokenTransfer.status = 'pending';
@@ -79,18 +97,20 @@ export class AppController {
     const transfer = TOKENS_TRANSFERS_MAP.get(id);
 
     if (!transfer) {
-      throw new BadRequestException(`Token transfer not found: ${ id }`);
+      throw new BadRequestException(`Token transfer not found: ${id}`);
     }
 
     const senderTokensAvailable = USERS_TOKENS_MAP.get(transfer.senderId);
     const recipientTokensAvailable = USERS_TOKENS_MAP.get(transfer.recipientId);
 
     if (!senderTokensAvailable) {
-      throw new BadRequestException(`User tokens available not found: ${ id }`);
+      throw new BadRequestException(`User tokens available not found: ${id}`);
     }
 
     if (senderTokensAvailable.tokens < transfer.amount) {
-      throw new BadRequestException(`User has only ${ senderTokensAvailable.tokens } tokens available. Operation is not allowed`);
+      throw new BadRequestException(
+        `User has only ${senderTokensAvailable.tokens} tokens available. Operation is not allowed`,
+      );
     }
 
     senderTokensAvailable.tokens -= Number(transfer.amount);
