@@ -8,6 +8,11 @@
 
   This is not a monorepo by design. `node_modules` are not combined, so you need to install packages for both parts of the project.
 
+* Libraries used:
+  * https://mui.com/material-ui/all-components/
+  * https://react.dev/
+  * https://docs.nestjs.com/
+
 ## Installation
 
 1. `cd ./backend`, `npm install`
