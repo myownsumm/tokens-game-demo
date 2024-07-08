@@ -31,6 +31,7 @@ export function CreateTransferRequest({ senderId, handleClose }: RequestTransfer
       } }
       validationSchema={ validationSchema }
       onSubmit={ values => {
+        // TODO. Url hardcoded for demo purposes. Should be moved to config.
         axios.request({ method: 'POST', url: 'http://localhost:3000/tokens-transfers', data: values })
           .then(
             () => {

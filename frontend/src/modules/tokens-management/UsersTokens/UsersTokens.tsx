@@ -37,6 +37,7 @@ export function UsersTokens() {
   const [ tokensAvailable, setTokensAvailable ] = useState<UserTokensAvailable[]>([]);
 
   function fetchUsersTokens(): void {
+    // TODO. Url hardcoded for demo purposes. Should be moved to config.
     axios.request({ method: 'GET', url: 'http://localhost:3000/users-tokens' })
       .then(
         response => {
@@ -51,6 +52,7 @@ export function UsersTokens() {
   // Listening to messages to demonstrate Real Time update possibilities.
   useEffect(() => fetchUsersTokens(), [ authUser, messages ]);
 
+  // TODO. This is a temporary solution. Should be moved to a separate component.
   const style = {
     position: 'absolute' as 'absolute',
     top: '50%',
