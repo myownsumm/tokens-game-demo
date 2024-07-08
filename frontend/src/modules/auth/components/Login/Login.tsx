@@ -13,7 +13,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { AuthPayload } from '../../auth.typings.ts';
 import { getUserByEmail } from '../../auth.mock.ts';
-import { useNotifications } from '@u-cat/u-notifications/dist/providers/u-notifications.provider';
+import { useNotifications } from '@u-cat/u-notifications';
 
 
 const defaultTheme = createTheme();

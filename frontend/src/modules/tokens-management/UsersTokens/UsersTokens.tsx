@@ -13,7 +13,7 @@ import { CanDo, CanDoOperations } from '../../permissions-control/components/Can
 import { AUTH_USERS } from '../../auth/auth.mock.ts';
 import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNotifications } from '@u-cat/u-notifications/dist/providers/u-notifications.provider';
+import { useNotifications } from '@u-cat/u-notifications';
 import { UserTokensAvailable } from '../tokens.typings.ts';
 import { CreateTransferRequest } from '../CreateTransferRequest/CreateTransferRequest.tsx';
 import { useMessages } from '../../messages/providers/messages.provider.tsx';
